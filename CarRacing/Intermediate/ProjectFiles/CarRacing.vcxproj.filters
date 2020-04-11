@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\CarRacing.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{F10B5CAA-DD79-4C0A-9723-78D57A1ACB45}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\CarRacing.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\CarRacingEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <Filter Include="Config">
+      <UniqueIdentifier>{2E24FBBD-5F3B-4912-AB06-FE6212609CE8}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEditorPerProjectUserSettings.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultInput.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Source\CarRacing">
+      <UniqueIdentifier>{D8C40147-9789-4A69-9CBE-60475B854688}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\CarRacing\CarRacing.Build.cs">
+      <Filter>Source\CarRacing</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\CarRacing\CarRacing.cpp">
+      <Filter>Source\CarRacing</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\CarRacing\CarRacing.h">
+      <Filter>Source\CarRacing</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\CarRacing\CarRacingGameMode.cpp">
+      <Filter>Source\CarRacing</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\CarRacing\CarRacingGameMode.h">
+      <Filter>Source\CarRacing</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\CarRacing\CarRacingHud.cpp">
+      <Filter>Source\CarRacing</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\CarRacing\CarRacingHud.h">
+      <Filter>Source\CarRacing</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\CarRacing\CarRacingPawn.cpp">
+      <Filter>Source\CarRacing</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\CarRacing\CarRacingPawn.h">
+      <Filter>Source\CarRacing</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\CarRacing\CarRacingWheelFront.cpp">
+      <Filter>Source\CarRacing</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\CarRacing\CarRacingWheelFront.h">
+      <Filter>Source\CarRacing</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\CarRacing\CarRacingWheelRear.cpp">
+      <Filter>Source\CarRacing</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\CarRacing\CarRacingWheelRear.h">
+      <Filter>Source\CarRacing</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
