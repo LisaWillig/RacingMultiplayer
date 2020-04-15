@@ -21,7 +21,7 @@ void EmptyLinkFunctionForGeneratedCodeCarRacing_init() {}
 				nullptr,
 				0,
 				PKG_CompiledIn | 0x00000000,
-				0x46261E48,
+				0x48CDE1F9,
 				0xE3024492,
 				METADATA_PARAMS(nullptr, 0)
 			};
