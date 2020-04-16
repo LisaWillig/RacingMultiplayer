@@ -1,8 +1,0 @@
-{
-	"SourceFiles": [
-		"C:\\Coding\\Repositories\\RacingMultiplayer\\CarRacing\\Source\\CarRacing\\CarRacing.Build.cs",
-		"C:\\Coding\\Repositories\\RacingMultiplayer\\CarRacing\\Source\\CarRacing.Target.cs",
-		"C:\\Coding\\Repositories\\RacingMultiplayer\\CarRacing\\Source\\CarRacingEditor.Target.cs"
-	],
-	"EngineVersion": "4.24.3"
-}

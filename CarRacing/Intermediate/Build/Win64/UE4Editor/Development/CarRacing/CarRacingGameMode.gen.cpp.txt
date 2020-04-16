@@ -1,9 +1,0 @@
-C:\Coding\Repositories\RacingMultiplayer\CarRacing\Intermediate\Build\Win64\UE4Editor\Development\CarRacing\Definitions.CarRacing.h
-C:\Program Files\Epic Games\UE_4.24\Engine\Source\Runtime\CoreUObject\Public\UObject/GeneratedCppIncludes.h
-C:\Program Files\Epic Games\UE_4.24\Engine\Source\Runtime\CoreUObject\Public\UObject/MetaData.h
-C:\Coding\Repositories\RacingMultiplayer\CarRacing\Source\CarRacing/CarRacingGameMode.h
-C:\Program Files\Epic Games\UE_4.24\Engine\Source\Runtime\Engine\Classes\GameFramework/GameModeBase.h
-C:\Program Files\Epic Games\UE_4.24\Engine\Source\Runtime\Engine\Classes\Engine/ServerStatReplicator.h
-C:\Program Files\Epic Games\UE_4.24\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\ServerStatReplicator.generated.h
-C:\Program Files\Epic Games\UE_4.24\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\GameModeBase.generated.h
-C:\Coding\Repositories\RacingMultiplayer\CarRacing\Intermediate\Build\Win64\UE4Editor\Inc\CarRacing\CarRacingGameMode.generated.h
