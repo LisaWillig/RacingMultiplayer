@@ -59,6 +59,21 @@ private:
 	float Gravity;
 	FVector Velocity; 
 
+	UPROPERTY(Replicated)
+	FVector ReplicatedLocation;
+
+	UPROPERTY(Replicated)
+	FRotator ReplicatedRotation;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_MoveRight(float Value);		
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_MoveForward(float Value);
+
+	void SetReplicatedState();
+	void GetReplicatedState();
+
 	void CalculateVelocity(float DeltaTime);
 	void CalculateAirResistance();
 	void ApplyTranslation(float DeltaTime);

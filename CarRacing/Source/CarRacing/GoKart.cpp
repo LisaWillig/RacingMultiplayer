@@ -4,6 +4,7 @@
 #include "GoKart.h"
 #include "Components/InputComponent.h"
 #include "Engine/World.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AGoKart::AGoKart()
@@ -17,8 +18,10 @@ AGoKart::AGoKart()
 void AGoKart::BeginPlay()
 {
 	Super::BeginPlay();
-
-	
+	CalculateRollingResistance();
+	if (HasAuthority()) {
+		NetUpdateFrequency = 1;
+	}
 }
 
 void AGoKart::CalculateRollingResistance()
@@ -32,10 +35,30 @@ void AGoKart::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	CalculateRollingResistance();
-	CalculateVelocity(DeltaTime);
-	ApplyRotation(DeltaTime);
-	ApplyTranslation(DeltaTime);	
+	if (HasAuthority())
+	{
+		CalculateVelocity(DeltaTime);
+		ApplyRotation(DeltaTime);
+		ApplyTranslation(DeltaTime);
+		SetReplicatedState();
+
+	}
+	else
+	{
+		GetReplicatedState();
+	}
+
+	
+	
+}
+void AGoKart::SetReplicatedState() {
+	ReplicatedLocation = GetActorLocation();
+	ReplicatedRotation = GetActorRotation();
+}
+
+void AGoKart::GetReplicatedState() {
+	SetActorLocation(ReplicatedLocation);
+	SetActorRotation(ReplicatedRotation);
 }
 
 void AGoKart::ApplyRotation(float DeltaTime)
@@ -69,6 +92,14 @@ void AGoKart::CalculateVelocity(float DeltaTime) {
 	FVector Accelaration = (Force + AirResistance + RollingResistance) / Mass;
 	Velocity = Velocity + Accelaration * DeltaTime;
 }
+
+void AGoKart::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AGoKart, ReplicatedLocation);
+	DOREPLIFETIME(AGoKart, ReplicatedRotation);
+}
+
 // Called to bind functionality to input
 void AGoKart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -81,9 +112,24 @@ void AGoKart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AGoKart::MoveForward(float Val)
 {
 	Throttle = Val;
+	Server_MoveForward(Val);
 }
 
 void AGoKart::MoveRight(float Val)
 {
 	Steeringthrow = Val;
+	Server_MoveRight(Val);
+}
+
+void AGoKart::Server_MoveForward_Implementation(float Val){
+	Throttle = Val;
+}
+bool AGoKart::Server_MoveForward_Validate(float Val) {
+	return FMath::Abs(Val) <= 1;
+}
+void AGoKart::Server_MoveRight_Implementation(float Val) {
+	Steeringthrow = Val;
+}
+bool AGoKart::Server_MoveRight_Validate(float Val) {
+	return FMath::Abs(Val) <= 1;
 }
