@@ -40,7 +40,7 @@ public:
 
 
 	UPROPERTY(EditAnywhere)
-		float RRCoefficient = 0.5; // Air Resistance Coefficient
+		float RRCoefficient = 0.1; // Air Resistance Coefficient
 
 	UPROPERTY(EditAnywhere)
 	float MaxDegreePerSecond = 90; //Nb of Degree /s to rotate

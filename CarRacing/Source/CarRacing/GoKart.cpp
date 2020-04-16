@@ -23,8 +23,8 @@ void AGoKart::BeginPlay()
 
 void AGoKart::CalculateRollingResistance()
 {
-	Gravity = (GetWorld()->GetGravityZ()) / 100;
-	RollingResistance = RRCoefficient * Velocity.GetSafeNormal()* Gravity * Mass;
+	Gravity = -(GetWorld()->GetGravityZ()) / 100;
+	RollingResistance = - RRCoefficient * Velocity.GetSafeNormal()* Gravity * Mass;
 }
 
 // Called every frame
@@ -66,8 +66,7 @@ void AGoKart::CalculateAirResistance() {
 void AGoKart::CalculateVelocity(float DeltaTime) {
 	CalculateAirResistance();
 	Force = GetActorForwardVector() * MaxDrivingForce * Throttle;
-	FVector Accelaration = (Force + AirResistance) / Mass;
-	UE_LOG(LogTemp, Warning, TEXT("Resistance: %s"), *(Force + AirResistance - RollingResistance).ToString())
+	FVector Accelaration = (Force + AirResistance + RollingResistance) / Mass;
 	Velocity = Velocity + Accelaration * DeltaTime;
 }
 // Called to bind functionality to input
