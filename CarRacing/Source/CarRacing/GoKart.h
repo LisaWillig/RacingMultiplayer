@@ -4,7 +4,41 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "GoKartMovementComponent.h"
 #include "GoKart.generated.h"
+
+
+USTRUCT()
+struct FGoKartMove {
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	float Throttle;
+
+	UPROPERTY()
+	float Steeringthrow;
+
+	UPROPERTY()
+	float DeltaTime;
+
+	UPROPERTY()
+	float Time;
+};
+
+USTRUCT()
+struct FGoKartState {
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	FGoKartMove LastMove;
+
+	UPROPERTY()
+	FVector Velocity;
+
+	UPROPERTY()
+	FTransform Transform;
+};
+
 
 UCLASS()
 class CARRACING_API AGoKart : public APawn
@@ -19,66 +53,37 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void CalculateRollingResistance();
+	
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(EditAnywhere)
-	float Mass = 1000; //kg
-
-	UPROPERTY(EditAnywhere)
-	float MaxDrivingForce = 10000; //N
-
-	UPROPERTY(EditAnywhere)
-	float DragCoefficient = 10; // Air Resistance Coefficient
-
-
-	UPROPERTY(EditAnywhere)
-		float RRCoefficient = 0.1; // Air Resistance Coefficient
-
-	UPROPERTY(EditAnywhere)
-	float MaxDegreePerSecond = 90; //Nb of Degree /s to rotate
-
-	FVector Force;
-	FVector AirResistance;
-	FVector RollingResistance;
-	float Throttle;
-	float Steeringthrow;
 
 private:
-	/** Handle pressing forwards */
+
+	UPROPERTY()
+	FGoKartMove CurrentMove;
+
+	UGoKartMovementComponent Movement; 
 	void MoveForward(float Val);
 	void MoveRight(float Val);
 
-	float Gravity;
-	FVector Velocity; 
-
-	UPROPERTY(ReplicatedUsing= OnRep_ReplicatedTransform)
-	FTransform ReplicatedTransform;
-
 	UFUNCTION()
-	void OnRep_ReplicatedTransform();
+	void OnRep_ServerState();
 
+	UPROPERTY(ReplicatedUsing = OnRep_ServerState)
+	FGoKartState ServerState;
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_MoveRight(float Value);		
+	void Server_SendMove(FGoKartMove Move);
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_MoveForward(float Value);
-
-	void SetReplicatedState();
 	void GetReplicatedState();
 
-	void CalculateVelocity(float DeltaTime);
-	void CalculateAirResistance();
-	void ApplyTranslation(float DeltaTime);
-	void ApplyRotation(float DeltaTime);
-	void ResetVelocity(FHitResult HitResult);
+	void ClearAcknowledgedMoves(FGoKartMove LastMove);
+
+	TArray<FGoKartMove> UnacknowledgedMoves;
 	
 };
