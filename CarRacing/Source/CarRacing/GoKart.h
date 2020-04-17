@@ -59,11 +59,12 @@ private:
 	float Gravity;
 	FVector Velocity; 
 
-	UPROPERTY(Replicated)
-	FVector ReplicatedLocation;
+	UPROPERTY(ReplicatedUsing= OnRep_ReplicatedTransform)
+	FTransform ReplicatedTransform;
 
-	UPROPERTY(Replicated)
-	FRotator ReplicatedRotation;
+	UFUNCTION()
+	void OnRep_ReplicatedTransform();
+
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_MoveRight(float Value);		

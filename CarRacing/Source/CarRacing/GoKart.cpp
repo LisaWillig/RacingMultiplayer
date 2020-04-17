@@ -34,31 +34,29 @@ void AGoKart::CalculateRollingResistance()
 void AGoKart::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	CalculateVelocity(DeltaTime);
+	ApplyRotation(DeltaTime);
+	ApplyTranslation(DeltaTime);
 
-	if (HasAuthority())
-	{
-		CalculateVelocity(DeltaTime);
-		ApplyRotation(DeltaTime);
-		ApplyTranslation(DeltaTime);
+	if (HasAuthority()) {
 		SetReplicatedState();
-
 	}
-	else
-	{
+
+}
+
+void AGoKart::OnRep_ReplicatedTransform() {
+
+	if (!HasAuthority()) {
 		GetReplicatedState();
 	}
-
-	
-	
 }
+
 void AGoKart::SetReplicatedState() {
-	ReplicatedLocation = GetActorLocation();
-	ReplicatedRotation = GetActorRotation();
+	ReplicatedTransform = GetActorTransform();
 }
 
 void AGoKart::GetReplicatedState() {
-	SetActorLocation(ReplicatedLocation);
-	SetActorRotation(ReplicatedRotation);
+	SetActorTransform(ReplicatedTransform);
 }
 
 void AGoKart::ApplyRotation(float DeltaTime)
@@ -96,8 +94,7 @@ void AGoKart::CalculateVelocity(float DeltaTime) {
 void AGoKart::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AGoKart, ReplicatedLocation);
-	DOREPLIFETIME(AGoKart, ReplicatedRotation);
+	DOREPLIFETIME(AGoKart, ReplicatedTransform);
 }
 
 // Called to bind functionality to input
