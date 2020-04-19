@@ -2,6 +2,7 @@
 
 
 #include "GoKartMovementComponent.h"
+#include "GameFrameWork/GameState.h"
 
 // Sets default values for this component's properties
 UGoKartMovementComponent::UGoKartMovementComponent()
@@ -9,7 +10,6 @@ UGoKartMovementComponent::UGoKartMovementComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
 }
 
 
@@ -33,9 +33,33 @@ void UGoKartMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 
+	if (GetOwnerRole() == ROLE_AutonomousProxy || GetOwner()->GetRemoteRole() == ROLE_SimulatedProxy)
+	{
+		CurrentMove = CreateMove(DeltaTime);
+		SimulateMove(CurrentMove);
+	}
+
 }
 
-void UGoKartMovementComponent::SimulateMove(const FGoKartMove& Move) {
+void UGoKartMovementComponent::SetThrottle(float newThrottle) {
+	Throttle = newThrottle;
+}
+
+void UGoKartMovementComponent::SetSteeringThrow(float newSteeringThrow) {
+	SteeringThrow = newSteeringThrow;
+}
+FGoKartMove UGoKartMovementComponent::CreateMove(float DeltaTime)
+{
+	FGoKartMove NewMove;
+	NewMove.DeltaTime = DeltaTime;
+	NewMove.Steeringthrow = SteeringThrow;
+	NewMove.Throttle = Throttle;
+	NewMove.Time = GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
+
+	return NewMove;
+}
+
+void UGoKartMovementComponent::SimulateMove(FGoKartMove& Move) {
 	CalculateVelocity(Move);
 	ApplyRotation(Move);
 	ApplyTranslation(Move.DeltaTime);

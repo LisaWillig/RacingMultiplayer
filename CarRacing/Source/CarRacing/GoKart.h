@@ -5,39 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "GoKartMovementComponent.h"
+#include "GoKartReplicatedComponent.h"
 #include "GoKart.generated.h"
 
-
-USTRUCT()
-struct FGoKartMove {
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY()
-	float Throttle;
-
-	UPROPERTY()
-	float Steeringthrow;
-
-	UPROPERTY()
-	float DeltaTime;
-
-	UPROPERTY()
-	float Time;
-};
-
-USTRUCT()
-struct FGoKartState {
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY()
-	FGoKartMove LastMove;
-
-	UPROPERTY()
-	FVector Velocity;
-
-	UPROPERTY()
-	FTransform Transform;
-};
 
 
 UCLASS()
@@ -61,29 +31,23 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY()
+	float Throttle;
+		
+	UPROPERTY()
+	float SteeringThrow;
 
 private:
 
-	UPROPERTY()
-	FGoKartMove CurrentMove;
 
-	UGoKartMovementComponent Movement; 
+
+	UPROPERTY(VisibleAnywhere)
+	UGoKartMovementComponent* MovementComponent; 
+
+	UPROPERTY(VisibleAnywhere)
+	UGoKartReplicatedComponent* ReplicatingComponent;
+
 	void MoveForward(float Val);
 	void MoveRight(float Val);
-
-	UFUNCTION()
-	void OnRep_ServerState();
-
-	UPROPERTY(ReplicatedUsing = OnRep_ServerState)
-	FGoKartState ServerState;
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SendMove(FGoKartMove Move);
-
-	void GetReplicatedState();
-
-	void ClearAcknowledgedMoves(FGoKartMove LastMove);
-
-	TArray<FGoKartMove> UnacknowledgedMoves;
 	
 };

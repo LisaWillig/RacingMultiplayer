@@ -4,8 +4,39 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "GoKart.h"
 #include "GoKartMovementComponent.generated.h"
+
+
+USTRUCT()
+struct FGoKartMove {
+	GENERATED_USTRUCT_BODY()
+
+		UPROPERTY()
+		float Throttle;
+
+	UPROPERTY()
+		float Steeringthrow;
+
+	UPROPERTY()
+		float DeltaTime;
+
+	UPROPERTY()
+		float Time;
+};
+
+USTRUCT()
+struct FGoKartState {
+	GENERATED_USTRUCT_BODY()
+
+		UPROPERTY()
+		FGoKartMove LastMove;
+
+	UPROPERTY()
+		FVector Velocity;
+
+	UPROPERTY()
+		FTransform Transform;
+};
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -24,16 +55,19 @@ public:
 	FGoKartMove GetMove();
 
 	void SimulateMove(FGoKartMove& Move);
-
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	
+
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	void SetThrottle(float newThrottle);
 
+	void SetSteeringThrow(float newSteeringThrow);
 private:
 	
 	void CalculateRollingResistance();
@@ -41,12 +75,11 @@ private:
 	void CalculateAirResistance();
 	void ApplyTranslation(float DeltaTime);
 	void ApplyRotation(FGoKartMove Move);
+	FGoKartMove CreateMove(float DeltaTime);
 
-	//UPROPERTY()
-	FGoKartMove CurrentMove;
-
-	float Gravity;
 	FVector Velocity;
+	float Gravity;
+	
 
 	UPROPERTY(EditAnywhere)
 	float Mass = 1000; //kg
@@ -64,7 +97,11 @@ private:
 	UPROPERTY(EditAnywhere)
 	float MaxDegreePerSecond = 90; //Nb of Degree /s to rotate
 
+	float Throttle;
+	float SteeringThrow;
+
 	FVector Force;
 	FVector AirResistance;
 	FVector RollingResistance;
+	FGoKartMove CurrentMove;
 };
