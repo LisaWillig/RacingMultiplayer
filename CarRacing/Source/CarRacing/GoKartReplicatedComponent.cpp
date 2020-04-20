@@ -29,21 +29,18 @@ void UGoKartReplicatedComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (MovementComponent == nullptr) return;
-
-
 	LastMove = MovementComponent->GetMove();
-	 
 
 	 if (GetOwnerRole() == ROLE_AutonomousProxy){
 		 UnacknowledgedMoves.Add(LastMove);
 		 Server_SendMove(LastMove);
 	 }
 
-	 if (GetOwner()->GetRemoteRole() == ROLE_SimulatedProxy){
-		 UpdateServerState(LastMove);
-	 }
+	if (GetOwner()->HasLocalNetOwner()){
+		UpdateServerState(LastMove);
+	}
 
-	 if (GetOwnerRole() == ROLE_SimulatedProxy){
+	 if (GetOwnerRole() == ROLE_SimulatedProxy) {
 		 ClientTick(DeltaTime);
 	 }
 }
@@ -54,7 +51,7 @@ void UGoKartReplicatedComponent::ClientTick(float DeltaTime) {
 	
 	FVector TargetLocation = ServerState.Transform.GetLocation();
 	float LERPRatio = ClientTimeSinceUpdate / ClientTimeBetweenUpdates;
-	FVector NextLocation = FMath::Lerp(StartLocation, TargetLocation, LERPRatio);
+	FVector NextLocation = FMath::LerpStable(StartLocation, TargetLocation, LERPRatio);
 
 	GetOwner()->SetActorLocation(NextLocation);
 }
@@ -64,11 +61,7 @@ void UGoKartReplicatedComponent::UpdateServerState(const FGoKartMove& Move)
 	ServerState.LastMove = Move;
 	ServerState.Transform = GetOwner()->GetActorTransform();
 	ServerState.Velocity = MovementComponent->GetVelocity();
-
-
 }
-
-
 
 FGoKartMove UGoKartReplicatedComponent::GetLastMove() {return LastMove;}
 
@@ -101,7 +94,7 @@ void UGoKartReplicatedComponent::OnRep_ServerState() {
 void UGoKartReplicatedComponent::SimulatedProxy_OnRep_ServerState() {
 	ClientTimeBetweenUpdates = ClientTimeSinceUpdate;
 	ClientTimeSinceUpdate = 0;
-	StartLocation = ServerState.Transform.GetLocation();
+	StartLocation = GetOwner()->GetActorLocation();
 }
 void UGoKartReplicatedComponent::AutonomusProxy_OnRep_ServerState() {
 
