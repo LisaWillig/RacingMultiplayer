@@ -3,6 +3,7 @@
 
 #include "GoKartReplicatedComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "GameFrameWork/GameState.h"
 
 // Sets default values for this component's properties
 UGoKartReplicatedComponent::UGoKartReplicatedComponent()
@@ -47,19 +48,54 @@ void UGoKartReplicatedComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 void UGoKartReplicatedComponent::ClientTick(float DeltaTime) {
 	ClientTimeSinceUpdate += DeltaTime;
-	if (ClientTimeBetweenUpdates < KINDA_SMALL_NUMBER) return;
-	
-	FVector TargetLocation = ServerState.Transform.GetLocation();
-	float LERPRatio = ClientTimeSinceUpdate / ClientTimeBetweenUpdates;
-	FVector NextLocation = FMath::LerpStable(StartLocation, TargetLocation, LERPRatio);
 
+	if (ClientTimeBetweenUpdates < KINDA_SMALL_NUMBER) return;
+	if (MovementComponent == nullptr) return;
+
+	float LERPRatio = ClientTimeSinceUpdate / ClientTimeBetweenUpdates;
+	float VelocityToDerivative = ClientTimeBetweenUpdates * 100;
+
+	SplineCreation(VelocityToDerivative);
+
+	InterpolateLocation(LERPRatio);
+	InterpolateRotation(LERPRatio);
+	InterpolateVelocity(LERPRatio, VelocityToDerivative);
+}
+
+void UGoKartReplicatedComponent::SplineCreation(float VelocityToDerivative)
+{
+	Spline.TargetLocation = ServerState.Transform.GetLocation();
+	Spline.StartLocation = ClientTransform.GetLocation();
+	Spline.StartDerivative = ClientStartVelocity * VelocityToDerivative;
+	Spline.TargetDerivative = ServerState.Velocity * VelocityToDerivative;
+}
+
+void UGoKartReplicatedComponent::InterpolateLocation(float LERPRatio)
+{
+	FVector NextLocation = Spline.InterpolateRotation(LERPRatio);
 	GetOwner()->SetActorLocation(NextLocation);
+}
+
+void UGoKartReplicatedComponent::InterpolateRotation(float LERPRatio)
+{
+	FQuat TargetRotation = ServerState.Transform.GetRotation();
+	FQuat StartRotation = ClientTransform.GetRotation();
+	FQuat NextRotation = FQuat::Slerp(StartRotation, TargetRotation, LERPRatio);
+	GetOwner()->SetActorRotation(NextRotation);
+}
+
+void UGoKartReplicatedComponent::InterpolateVelocity(float LERPRatio, float VelocityToDerivative)
+{
+	FVector NextDerivative = Spline.InterpolateDerivative(LERPRatio);
+	FVector NextVelocity = NextDerivative / VelocityToDerivative;
+	MovementComponent->SetVelocity(NextVelocity);
 }
 
 void UGoKartReplicatedComponent::UpdateServerState(const FGoKartMove& Move)
 {
 	ServerState.LastMove = Move;
 	ServerState.Transform = GetOwner()->GetActorTransform();
+	if (MovementComponent == nullptr) return;
 	ServerState.Velocity = MovementComponent->GetVelocity();
 }
 
@@ -94,7 +130,9 @@ void UGoKartReplicatedComponent::OnRep_ServerState() {
 void UGoKartReplicatedComponent::SimulatedProxy_OnRep_ServerState() {
 	ClientTimeBetweenUpdates = ClientTimeSinceUpdate;
 	ClientTimeSinceUpdate = 0;
-	StartLocation = GetOwner()->GetActorLocation();
+	ClientTransform = GetOwner()->GetActorTransform();
+	if (MovementComponent == nullptr) return;
+	ClientStartVelocity = MovementComponent->GetVelocity();
 }
 void UGoKartReplicatedComponent::AutonomusProxy_OnRep_ServerState() {
 
@@ -121,11 +159,21 @@ void UGoKartReplicatedComponent::Server_SendMove_Implementation(FGoKartMove Move
 	if (MovementComponent == nullptr) return;
 
 	MovementComponent->SimulateMove(Move);
-
+	ClientReplicatedTime += Move.DeltaTime;
 	UpdateServerState(Move);
 }
 
 bool UGoKartReplicatedComponent::Server_SendMove_Validate(FGoKartMove Move) {
-	//TODO: Validate
+
+	float proposedTime = ClientReplicatedTime + Move.DeltaTime;
+	bool ClientRunningAhead = proposedTime > GetWorld()->TimeSeconds;
+	if (ClientRunningAhead) {
+		UE_LOG(LogTemp, Error, TEXT("Client running to fast"))
+		return false;
+	}
+	if (!Move.IsValid()) {
+		UE_LOG(LogTemp, Error, TEXT("Move is not valid: Throttle or SteeringThrow too high"))
+		return false;
+	}
 	return true;
 }

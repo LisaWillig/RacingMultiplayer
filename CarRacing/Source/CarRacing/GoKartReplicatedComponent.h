@@ -7,6 +7,15 @@
 #include "GoKartMovementComponent.h"
 #include "GoKartReplicatedComponent.generated.h"
 
+struct FHermitCubicSpline {
+	FVector StartLocation, TargetLocation, StartDerivative, TargetDerivative;
+	FVector InterpolateRotation(float LERPRatio) const {
+		return FMath::CubicInterp(StartLocation, StartDerivative, TargetLocation, TargetDerivative, LERPRatio);
+	}
+	FVector InterpolateDerivative(float LERPRatio) const{
+		return FMath::CubicInterpDerivative(StartLocation, StartDerivative, TargetLocation, TargetDerivative, LERPRatio);
+	}
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CARRACING_API UGoKartReplicatedComponent : public UActorComponent
@@ -39,27 +48,36 @@ private:
 
 	void ClientTick(float DeltaTime);
 
+	void SplineCreation(float VelocityToDerivative);
+	void InterpolateVelocity(float LERPRatio, float VelocityToDerivative);
+	void InterpolateRotation(float LERPRatio);
+	void InterpolateLocation(float LERPRatio);
+	
+
 	UFUNCTION()
 		void OnRep_ServerState();
 
 	void SimulatedProxy_OnRep_ServerState();
 	void AutonomusProxy_OnRep_ServerState();
 
-	FVector StartLocation;
-
+	FTransform ClientTransform;
+	FVector ClientStartVelocity; 
+	FHermitCubicSpline Spline;
 	UPROPERTY(ReplicatedUsing = OnRep_ServerState)
 		FGoKartState ServerState;
 
 	float ClientTimeSinceUpdate;
 	float ClientTimeBetweenUpdates;
-	UPROPERTY()
-		UGoKartMovementComponent* MovementComponent;
 
+	UPROPERTY()
+	UGoKartMovementComponent* MovementComponent;
+	float ClientReplicatedTime;
 	FGoKartMove LastMove;
 
+	UPROPERTY(meta = (AllowPrivateAccess = "true"))
+	USceneComponent* MeshOffsetRoot;
 
-
-
-	
+	UFUNCTION(BlueprintCallable, meta = (AllowPrivateAccess = "true"))
+		void SetMeshOffsetRoot(USceneComponent* Root) { MeshOffsetRoot = Root;};
 
 };

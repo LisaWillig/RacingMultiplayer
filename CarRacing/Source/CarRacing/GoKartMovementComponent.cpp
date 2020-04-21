@@ -2,7 +2,7 @@
 
 
 #include "GoKartMovementComponent.h"
-#include "GameFrameWork/GameState.h"
+
 
 // Sets default values for this component's properties
 UGoKartMovementComponent::UGoKartMovementComponent()
@@ -54,7 +54,8 @@ FGoKartMove UGoKartMovementComponent::CreateMove(float DeltaTime)
 	NewMove.DeltaTime = DeltaTime;
 	NewMove.Steeringthrow = SteeringThrow;
 	NewMove.Throttle = Throttle;
-	NewMove.Time = GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
+	//NewMove.Time = GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
+	NewMove.Time = GetWorld()->GetTimeSeconds();
 
 	return NewMove;
 }
